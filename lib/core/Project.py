@@ -1,15 +1,14 @@
-from pprint import isreadable
-from turtle import update
 import pygame
 
-from lib.core.IUpdateable import IUpdateable
 from lib.screen.Screen import Screen
 
-class Project(IUpdateable):
-    def __init__(self, width, height) -> None:
+import lib.config.WindowConfig as WindowConfig
+
+class Project:
+    def __init__(self) -> None:
         pygame.init()
 
-        self.screen = pygame.display.set_mode((width, height))
+        self.screen = pygame.display.set_mode((WindowConfig.WIDTH, WindowConfig.HEIGHT))
         self.isRunning = True
 
         self.screens: list[Screen] = []
@@ -26,6 +25,5 @@ class Project(IUpdateable):
 
             if self.currentScreen is not None:
                 self.currentScreen.update(self.screen, events)
-
-    def update(self, screen, events):
-        super().update(screen, events)
+            
+            pygame.display.update()

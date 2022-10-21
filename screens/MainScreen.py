@@ -7,8 +7,9 @@ class MainScreen(Screen):
     def __init__(self) -> None:
         super().__init__()
 
-        self.UIElements.append(UIElement.from_json("MainScreen/Clicker.json"))
-        print(self.UIElements)
+        self.titletext = UIElement.from_json("MainScreen/TitleText.json")
+
+        self.UIElements.append(self.titletext)
 
     def update(self, screen:pygame.Surface, events):
         screen.fill((0, 0, 0))

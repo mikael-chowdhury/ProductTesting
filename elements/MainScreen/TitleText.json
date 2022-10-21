@@ -1,0 +1,13 @@
+{
+  "type": "Label",
+
+  "properties": {
+    "x": 110,
+    "y": 100,
+    "w": 150,
+    "h": 75,
+    "backgroundcolour": "eval((93, 93, 93))",
+    "anchor": "middle",
+    "text": "Hello World"
+  }
+}
