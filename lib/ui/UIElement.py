@@ -9,8 +9,10 @@ from lib.util.ResourceLocation import ResourceLocation
 
 import lib.config.RenderConfig as RenderConfig
 
+from lib.config.UIConfig import THEME
+
 class UIElement(IUpdateable):
-    def __init__(self, x=0, y=0, w=0, h=0, text="", font="Arial", fontSize=24, fontColour=(255, 255, 255), backgroundcolour=None) -> None:
+    def __init__(self, x=0, y=0, w=0, h=0, text="", font="Arial", fontSize=24, fontColour=(255, 255, 255), backgroundcolour=(0, 0, 0), borderColour=THEME.quaternery, backgroundimage=None) -> None:
         self.x = x
         self.y = y
         self.w = w
@@ -33,9 +35,23 @@ class UIElement(IUpdateable):
         self.anchor = None
 
         self.rect = pygame.Rect(self.x, self.y, self.w, self.h)
+
         self.backgroundcolour = backgroundcolour
 
+        self.backgroundimage = backgroundimage
+        self.lastbackgroundimage = self.backgroundimage
+        self.loadedbackgroundimage = None
+        self.load_backgroundimage()
+
         self.first_load = True
+
+        self.borderradius = 0
+        self.borderColour = borderColour
+        self.borderwidth = 0
+
+    def load_backgroundimage(self):
+        if self.backgroundimage is not None:
+            self.loadedbackgroundimage = pygame.transform.scale(pygame.image.load(ResourceLocation(os.path.join("assets", self.backgroundimage))), (self.w, self.h)).convert_alpha()
 
     def load_text(self):
         if self.text.strip() != "":
@@ -64,13 +80,24 @@ class UIElement(IUpdateable):
         if self.lasttext != self.text or self.lastfont != self.font or self.lastfontsize != self.fontSize or self.lastfontcolour != self.fontColour:
             self.load_text()
 
+        if self.lastbackgroundimage != self.backgroundimage:
+            self.load_backgroundimage()
+            self.lastbackgroundimage = self.backgroundimage
+
         if self.anchor is not None:
             self.anchor_element(RectLocation.__getitem__(self.anchor.upper()))
 
         self.rect = pygame.Rect(self.x, self.y, self.w, self.h)
 
         if self.backgroundcolour is not None:
-            pygame.draw.rect(screen, self.backgroundcolour, self.rect)
+            pygame.draw.rect(screen, self.backgroundcolour, self.rect, border_radius=self.borderradius)
+
+        if self.borderwidth > 0:
+            pygame.draw.rect(screen, self.borderColour, self.rect, width=self.borderwidth, border_radius=self.borderradius)
+        
+        if self.loadedbackgroundimage is not None:
+            rect = self.loadedbackgroundimage.get_rect(center=self.rect.center)
+            screen.blit(self.loadedbackgroundimage, rect)
 
         if self.loaded_text is not None:
             rect = self.loaded_text.get_rect(center=self.rect.center)

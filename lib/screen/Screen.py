@@ -3,6 +3,7 @@ from lib.core.IUpdateable import IUpdateable
 from lib.ui.UIElement import UIElement
 from lib.util.ResourceLocation import ResourceLocation
 
+
 class Screen(IUpdateable):
     def __init__(self) -> None:
         super().__init__()

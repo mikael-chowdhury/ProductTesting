@@ -3,8 +3,11 @@ import pygame
 from lib.screen.Screen import Screen
 
 import lib.config.WindowConfig as WindowConfig
+from lib.config.UIConfig import THEME
 
 class Project:
+    instance = None
+
     def __init__(self) -> None:
         pygame.init()
 
@@ -13,6 +16,8 @@ class Project:
 
         self.screens: list[Screen] = []
         self.currentScreen = None
+
+        Project.instance = self
 
     def loop(self):
         while self.isRunning:
@@ -24,6 +29,7 @@ class Project:
                     self.isRunning = False
 
             if self.currentScreen is not None:
+                self.screen.fill(THEME.secondary)
                 self.currentScreen.update(self.screen, events)
             
             pygame.display.update()
