@@ -1,6 +1,7 @@
 from lib.ui.UIElement import UIElement
 
 from lib.config.UIConfig import THEME
+import lib.config.WindowConfig as WindowConfig
 
 import pygame
 
@@ -19,10 +20,11 @@ class Button(UIElement):
     def update(self, screen, events):
         super().update(screen, events, False)
 
-        for event in events:
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    if self.is_hovering(event.pos[0], event.pos[1]):
-                        self.onclick(screen, events, event.pos)
+        if not WindowConfig.DEBUG:
+            for event in events:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        if self.is_hovering(event.pos[0], event.pos[1]):
+                            self.onclick(screen, events, event.pos)
 
         self.first_load = False

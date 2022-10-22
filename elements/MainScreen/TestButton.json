@@ -1,11 +1,11 @@
 {
-    "type": "Button",
-  
-    "properties": {
-      "w": 150,
-      "h": 75,
-      "anchor": "topright",
-      "text": "next"
-    }
+  "type": "Button",
+  "id": "TestButton",
+
+  "properties": {
+    "w": 150,
+    "h": 75,
+    "anchor": "topright",
+    "text": "next"
   }
-  
+}

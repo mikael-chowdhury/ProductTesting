@@ -1,5 +1,6 @@
 {
   "type": "Label",
+  "id": "TitleText",
 
   "properties": {
     "w": 150,

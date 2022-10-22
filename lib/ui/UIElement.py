@@ -10,6 +10,7 @@ from lib.util.ResourceLocation import ResourceLocation
 import lib.config.RenderConfig as RenderConfig
 
 from lib.config.UIConfig import THEME
+import lib.config.WindowConfig as WindowConfig
 
 class UIElement(IUpdateable):
     def __init__(self, x=0, y=0, w=0, h=0, text="", font="Arial", fontSize=24, fontColour=(255, 255, 255), backgroundcolour=(0, 0, 0), borderColour=THEME.quaternery, backgroundimage=None) -> None:
@@ -49,6 +50,9 @@ class UIElement(IUpdateable):
         self.borderColour = borderColour
         self.borderwidth = 0
 
+        self.dragging = False
+        self.dragoffset = (0, 0)
+
     def load_backgroundimage(self):
         if self.backgroundimage is not None:
             self.loadedbackgroundimage = pygame.transform.scale(pygame.image.load(ResourceLocation(os.path.join("assets", self.backgroundimage))), (self.w, self.h)).convert_alpha()
@@ -77,6 +81,23 @@ class UIElement(IUpdateable):
         self.h = self.rect.h
     
     def update(self, screen, events, cancel_first_load=True):
+        if WindowConfig.DEBUG:
+            for event in events:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mx, my = event.pos
+                    if mx >= self.x and mx <= self.x + self.w and my >= self.y and my <= self.y + self.h:
+                        print("down")
+                        self.dragging = True
+                        self.dragoffset = (self.x-mx, self.y-my)
+
+                if event.type == pygame.MOUSEBUTTONUP:
+                    self.dragging = False
+
+        if self.dragging:
+            mx, my = pygame.mouse.get_pos()
+            self.x = mx + self.dragoffset[0]
+            self.y = my + self.dragoffset[1]
+
         if self.lasttext != self.text or self.lastfont != self.font or self.lastfontsize != self.fontSize or self.lastfontcolour != self.fontColour:
             self.load_text()
 
@@ -86,6 +107,7 @@ class UIElement(IUpdateable):
 
         if self.anchor is not None:
             self.anchor_element(RectLocation.__getitem__(self.anchor.upper()))
+            self.anchor = None
 
         self.rect = pygame.Rect(self.x, self.y, self.w, self.h)
 
@@ -115,6 +137,8 @@ class UIElement(IUpdateable):
 
         if element is not None:
             instance = element()
+
+            setattr(instance, "id", _json["id"])
 
             propertyKeys = _json["properties"].keys()
 

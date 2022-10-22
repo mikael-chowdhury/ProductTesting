@@ -1,2 +1,3 @@
 WIDTH = 320
 HEIGHT = 450
+DEBUG = True
