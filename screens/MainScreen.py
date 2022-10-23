@@ -2,6 +2,7 @@ from lib.screen.Screen import Screen
 from lib.ui.UIElement import UIElement
 from lib.screen.ScreenHandler import ScreenHandler
 
+from lib.icons.Icon import Icon
 import pygame
 
 class MainScreen(Screen):
@@ -9,8 +10,9 @@ class MainScreen(Screen):
         super().__init__()
 
         self.textLabel = UIElement.from_json("MainScreen/TitleText.json")
-        self.testButton = UIElement.from_json("MainScreen/TestButton.json")
 
+        self.testButton = UIElement.from_json("MainScreen/TestButton.json")
+        self.testButton.backgroundimage = Icon("user")
         self.testButton.onclick = lambda *args: self.next_screen()
 
         self.UIElements.append(self.textLabel)

@@ -13,7 +13,7 @@ from lib.config.UIConfig import THEME
 import lib.config.WindowConfig as WindowConfig
 
 class UIElement(IUpdateable):
-    def __init__(self, x=0, y=0, w=0, h=0, text="", font="Arial", fontSize=24, fontColour=(255, 255, 255), backgroundcolour=(0, 0, 0), borderColour=THEME.quaternery, backgroundimage=None) -> None:
+    def __init__(self, x=0, y=0, w=0, h=0, text="", font="Arial", fontSize=24, fontColour=(255, 255, 255), backgroundcolour=(0, 0, 0), borderColour=THEME.quaternery, backgroundimage=None, backgroundimagefittype="maximum") -> None:
         self.x = x
         self.y = y
         self.w = w
@@ -44,6 +44,8 @@ class UIElement(IUpdateable):
         self.loadedbackgroundimage = None
         self.load_backgroundimage()
 
+        self.backgroundimagefittype = backgroundimagefittype
+
         self.first_load = True
 
         self.borderradius = 0
@@ -53,9 +55,18 @@ class UIElement(IUpdateable):
         self.dragging = False
         self.dragoffset = (0, 0)
 
+        self.serializable_properties = ["x", "y", "w", "h", "text", "font", "fontColour", "fontSize", "backgroundcolour", "borderradius", "borderColour", "borderwidth"]
+
     def load_backgroundimage(self):
         if self.backgroundimage is not None:
-            self.loadedbackgroundimage = pygame.transform.scale(pygame.image.load(ResourceLocation(os.path.join("assets", self.backgroundimage))), (self.w, self.h)).convert_alpha()
+            self.loadedbackgroundimage = pygame.image.load(ResourceLocation(os.path.join("assets", self.backgroundimage))).convert_alpha()
+
+            if self.backgroundimagefittype == "stretch":
+                self.loadedbackgroundimage = pygame.transform.scale(self.loadedbackgroundimage, (self.w, self.h)).convert_alpha()
+
+            elif self.backgroundimagefittype == "maximum":
+                size = min(self.w, self.h)
+                self.loadedbackgroundimage = pygame.transform.scale(self.loadedbackgroundimage, (size, size)).convert_alpha()
 
     def load_text(self):
         if self.text.strip() != "":
@@ -86,7 +97,6 @@ class UIElement(IUpdateable):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mx, my = event.pos
                     if mx >= self.x and mx <= self.x + self.w and my >= self.y and my <= self.y + self.h:
-                        print("down")
                         self.dragging = True
                         self.dragoffset = (self.x-mx, self.y-my)
 
