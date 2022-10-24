@@ -4,6 +4,7 @@ import pygame
 
 from lib.core.IUpdateable import IUpdateable
 from lib.ui.anchors.RectLocation import RectLocation
+from lib.ui.masks.UIMask import UIMask
 
 from lib.util.ResourceLocation import ResourceLocation
 
@@ -13,11 +14,13 @@ from lib.config.UIConfig import THEME
 import lib.config.WindowConfig as WindowConfig
 
 class UIElement(IUpdateable):
-    def __init__(self, x=0, y=0, w=0, h=0, text="", font="Arial", fontSize=24, fontColour=(255, 255, 255), backgroundcolour=(0, 0, 0), borderColour=THEME.quaternery, backgroundimage=None, backgroundimagefittype="maximum") -> None:
+    def __init__(self, x=0, y=0, w=0, h=0, text="", font="Arial", fontSize=24, fontcolour=(255, 255, 255), backgroundcolour=(0, 0, 0), bordercolour=THEME.quaternery, backgroundimage=None, draggable=True, backgroundimagefittype="maximum") -> None:
         self.x = x
         self.y = y
         self.w = w
         self.h = h
+
+        self.draggable = draggable
 
         self.text = text
         self.lasttext = self.text
@@ -28,8 +31,8 @@ class UIElement(IUpdateable):
         self.fontSize = fontSize
         self.lastfontsize = self.fontSize
 
-        self.fontColour = fontColour
-        self.lastfontcolour = self.fontColour
+        self.fontcolour = fontcolour
+        self.lastfontcolour = self.fontcolour
 
         self.load_text()
 
@@ -48,14 +51,15 @@ class UIElement(IUpdateable):
 
         self.first_load = True
 
+        self.drawborder = True
         self.borderradius = 0
-        self.borderColour = borderColour
+        self.bordercolour = bordercolour
         self.borderwidth = 0
 
         self.dragging = False
         self.dragoffset = (0, 0)
 
-        self.serializable_properties = ["x", "y", "w", "h", "text", "font", "fontColour", "fontSize", "backgroundcolour", "borderradius", "borderColour", "borderwidth"]
+        self.serializable_properties = ["x", "y", "w", "h", "text", "font", "fontcolour", "fontSize", "backgroundcolour", "borderradius", "bordercolour", "borderwidth"]
 
     def load_backgroundimage(self):
         if self.backgroundimage is not None:
@@ -68,15 +72,17 @@ class UIElement(IUpdateable):
                 size = min(self.w, self.h)
                 self.loadedbackgroundimage = pygame.transform.scale(self.loadedbackgroundimage, (size, size)).convert_alpha()
 
+            self.mask = UIMask(self.loadedbackgroundimage, 127)
+
     def load_text(self):
         if self.text.strip() != "":
             self.loaded_font = pygame.font.Font(self.font, self.fontSize) if not self.font.lower() in pygame.font.get_fonts() else pygame.font.SysFont(self.font, self.fontSize)
-            self.loaded_text = self.loaded_font.render(self.text, RenderConfig.ANTIALIASING, self.fontColour)
+            self.loaded_text = self.loaded_font.render(self.text, RenderConfig.ANTIALIASING, self.fontcolour)
 
             self.lasttext = self.text
             self.lastfont = self.font
             self.lastfontsize = self.fontSize
-            self.lastfontcolour = self.fontColour
+            self.lastfontcolour = self.fontcolour
         else:
             self.loaded_font = None
             self.loaded_text = None
@@ -92,7 +98,7 @@ class UIElement(IUpdateable):
         self.h = self.rect.h
     
     def update(self, screen, events, cancel_first_load=True):
-        if WindowConfig.DEBUG:
+        if WindowConfig.DEBUG and self.draggable:
             for event in events:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mx, my = event.pos
@@ -108,7 +114,7 @@ class UIElement(IUpdateable):
             self.x = mx + self.dragoffset[0]
             self.y = my + self.dragoffset[1]
 
-        if self.lasttext != self.text or self.lastfont != self.font or self.lastfontsize != self.fontSize or self.lastfontcolour != self.fontColour:
+        if self.lasttext != self.text or self.lastfont != self.font or self.lastfontsize != self.fontSize or self.lastfontcolour != self.fontcolour:
             self.load_text()
 
         if self.lastbackgroundimage != self.backgroundimage:
@@ -124,9 +130,10 @@ class UIElement(IUpdateable):
         if self.backgroundcolour is not None:
             pygame.draw.rect(screen, self.backgroundcolour, self.rect, border_radius=self.borderradius)
 
-        if self.borderwidth > 0:
-            pygame.draw.rect(screen, self.borderColour, self.rect, width=self.borderwidth, border_radius=self.borderradius)
-        
+        if self.drawborder:
+            if self.borderwidth > 0:
+                pygame.draw.rect(screen, self.bordercolour, self.rect, width=self.borderwidth, border_radius=self.borderradius)
+            
         if self.loadedbackgroundimage is not None:
             rect = self.loadedbackgroundimage.get_rect(center=self.rect.center)
             screen.blit(self.loadedbackgroundimage, rect)

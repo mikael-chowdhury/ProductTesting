@@ -6,6 +6,9 @@
     "w": 150,
     "h": 75,
     "anchor": "topright",
-    "text": "next"
+    "text": "",
+    "isIcon": true,
+    "backgroundcolour": "eval(None)",
+    "drawborder": false
   }
 }

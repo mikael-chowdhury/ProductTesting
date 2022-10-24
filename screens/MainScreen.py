@@ -1,6 +1,9 @@
+from lib.core.Project import Project
 from lib.screen.Screen import Screen
 from lib.ui.UIElement import UIElement
 from lib.screen.ScreenHandler import ScreenHandler
+
+from lib.config.WindowConfig import WIDTH, HEIGHT
 
 from lib.icons.Icon import Icon
 import pygame

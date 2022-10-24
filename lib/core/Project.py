@@ -1,11 +1,15 @@
 import pygame
+from lib.core.DebuggingWindow import DebuggingWindow
 
 from lib.screen.Screen import Screen
 
 import lib.config.WindowConfig as WindowConfig
 import lib.config.RenderConfig as RenderConfig
 from lib.config.UIConfig import THEME
+from lib.ui.anchors.RectLocation import RectLocation
 from lib.ui.text.VaryingText import VaryingText
+
+from lib.ui.Button import Button
 
 class Project:
     instance = None
@@ -13,10 +17,11 @@ class Project:
     def __init__(self, debug=WindowConfig.DEBUG) -> None:
         pygame.init()
 
+        WindowConfig.DEBUG = debug
+
         if WindowConfig.DEBUG:
             self.window = pygame.display.set_mode((WindowConfig.WIDTH+WindowConfig.DEBUG_PANEL_SIZE_RIGHT, WindowConfig.HEIGHT+WindowConfig.DEBUG_PANEL_SIZE_BOTTOM))
             self.screen = self.window.subsurface(pygame.Rect(0, 0, WindowConfig.WIDTH, WindowConfig.HEIGHT))
-            
         else:
             self.window = pygame.display.set_mode((WindowConfig.WIDTH, WindowConfig.HEIGHT))
             self.screen = self.window
@@ -36,7 +41,15 @@ class Project:
 
         self.tick = 0
 
+        self.debugging_button = Button(text="DEBUG", w=125, h=50, draggable=False, external=True, onclick=lambda *args: self.open_debugging_window())
+        self.debugging_button.rect.topright = (WindowConfig.WIDTH+WindowConfig.DEBUG_PANEL_SIZE_RIGHT - 5, 5)
+        self.debugging_button.x = self.debugging_button.rect.x
+        self.debugging_button.y = self.debugging_button.rect.y
+
         Project.instance = self
+
+    def open_debugging_window(self):
+        DebuggingWindow()
 
     def loop(self):
         while self.isRunning:
@@ -104,5 +117,7 @@ class Project:
                 for property in self.selected_element_properties:
                     self.window.blit(property, rect)
                     rect.y += 35
+
+            self.debugging_button.update(self.window, events)
             
             pygame.display.update()
